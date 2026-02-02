@@ -157,14 +157,12 @@
             { id: 35, name: "錨", symbol: "⚓" }, { id: 36, name: "十字架", symbol: "✝️" }
         ];
 
-        // 占い開始の魔法
         async function startFortune(mode) {
             currentMode = mode;
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
             
             try {
-                // ここで外部のjsonファイルを読み込むよ
                 const response = await fetch('card_data.json');
                 cardData = await response.json();
                 spreadGrandTableau();
@@ -206,13 +204,13 @@
                     const data = cardData[card.name] || {};
                     grid.innerHTML += createCardHtml(card);
                     
-                    // モードによって表示する文章を変える
                     let meaning = "";
                     if (currentMode === 'love') meaning = data.love || "データなし";
                     else if (currentMode === 'work') meaning = data.work || "データなし";
                     else meaning = `✨${data.positive} / 💀${data.negative}`;
 
-                    explanationHtml += `・<b>${card.name}</b>（${data.keyword}）：${meaning}<br>`;
+                    // ここからキーワード表示を削除したよ
+                    explanationHtml += `・<b>${card.name}</b>：${meaning}<br>`;
                 }
                 rowDiv.appendChild(grid);
                 const descDiv = document.createElement('div');
@@ -222,7 +220,6 @@
                 tableau.appendChild(rowDiv);
             }
 
-            // 最終結論
             const finalRowDiv = document.createElement('div');
             finalRowDiv.className = 'panorama-row';
             finalRowDiv.innerHTML = `<div class="row-label">最終結論</div>`;
