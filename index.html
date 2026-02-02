@@ -23,13 +23,12 @@
             border-radius: 12px;
         }
         .row-label {
-            font-size: 0.75em;
+            font-size: 0.8em;
             font-weight: bold;
             margin-bottom: 8px;
             color: #4ecca3;
             border-left: 3px solid #4ecca3;
             padding-left: 8px;
-            opacity: 0.8;
         }
 
         .grid-layout { display: grid; gap: 4px; }
@@ -55,15 +54,8 @@
         }
 
         .card-symbol { font-size: 1.3em; margin-bottom: 2px; }
-        
-        /* 文字数によってサイズを変えるためのクラス */
-        .card-name { 
-            font-weight: bold; 
-            white-space: nowrap; 
-            font-size: 0.65em; /* 基本サイズ */
-        }
-        .card-name.long { font-size: 0.55em; } /* 4文字以上の時 */
-
+        .card-name { font-weight: bold; white-space: nowrap; font-size: 0.65em; }
+        .card-name.long { font-size: 0.55em; } /* 4文字以上の時に適用 */
         .card-no { font-size: 0.5em; opacity: 0.5; margin-top: 1px; }
 
         .button-container { text-align: center; margin-top: 20px; padding-bottom: 40px; }
@@ -75,14 +67,12 @@
             font-size: 0.9em;
             border-radius: 25px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(233, 69, 96, 0.3);
         }
 
         @media (max-width: 768px) {
             .grid-8 { gap: 2px; }
             .grid-4 { width: 100%; gap: 2px; }
             .card-symbol { font-size: 1.1em; }
-            h1 { font-size: 1.2em; }
         }
     </style>
 </head>
@@ -127,7 +117,6 @@
         }
 
         function createCardHtml(card) {
-            // 文字数が4文字以上なら 'long' クラスを付与
             const nameClass = card.name.length >= 4 ? "card-name long" : "card-name";
             return `
                 <div class="card">
@@ -143,7 +132,12 @@
             const tableau = document.getElementById('tableau');
             tableau.innerHTML = '';
 
-            const rowLabels = ["1st Row: Background", "2nd Row: Current Theme", "3rd Row: Near Future", "4th Row: Conclusion"];
+            const rowLabels = [
+                "1段目：過去の背景",
+                "2段目：現在のテーマ",
+                "3段目：直近の未来",
+                "4段目：結末・深層"
+            ];
             
             for (let i = 0; i < 4; i++) {
                 const rowDiv = document.createElement('div');
@@ -160,7 +154,7 @@
 
             const finalRowDiv = document.createElement('div');
             finalRowDiv.className = 'panorama-row';
-            finalRowDiv.innerHTML = `<div class="row-label">Destiny 4 Cards</div>`;
+            finalRowDiv.innerHTML = `<div class="row-label">最終結論まとめ</div>`;
             const finalGrid = document.createElement('div');
             finalGrid.className = 'grid-layout grid-4';
             for (let k = 32; k < 36; k++) {
