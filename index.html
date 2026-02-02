@@ -55,7 +55,8 @@
 
         .card-symbol { font-size: 1.3em; margin-bottom: 2px; }
         .card-name { font-weight: bold; white-space: nowrap; font-size: 0.65em; }
-        .card-name.long { font-size: 0.55em; } /* 4文字以上の時に適用 */
+        /* 4文字以上のカードをさらに1pt分(0.5em)小さくしたよ */
+        .card-name.long { font-size: 0.5em; } 
         .card-no { font-size: 0.5em; opacity: 0.5; margin-top: 1px; }
 
         .button-container { text-align: center; margin-top: 20px; padding-bottom: 40px; }
@@ -64,9 +65,10 @@
             color: white;
             border: none;
             padding: 12px 30px;
-            font-size: 0.9em;
+            font-size: 1em;
             border-radius: 25px;
             cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         @media (max-width: 768px) {
@@ -81,7 +83,7 @@
         <h1>Grand Tableau</h1>
         <div id="tableau"></div>
         <div class="button-container">
-            <button onclick="spreadGrandTableau()">SHUFFLE</button>
+            <button onclick="spreadGrandTableau()">カードをシャッフル</button>
         </div>
     </div>
 
