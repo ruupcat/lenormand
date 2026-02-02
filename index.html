@@ -53,11 +53,11 @@
             padding: 2px;
         }
 
-        .card-symbol { font-size: 1.3em; margin-bottom: 2px; }
-        .card-name { font-weight: bold; white-space: nowrap; font-size: 0.65em; }
-        /* 4文字以上のカードをさらに1pt分(0.5em)小さくしたよ */
-        .card-name.long { font-size: 0.5em; } 
-        .card-no { font-size: 0.5em; opacity: 0.5; margin-top: 1px; }
+        /* --- PC用の基本設定 --- */
+        .card-symbol { font-size: 1.8em; margin-bottom: 4px; }
+        .card-name { font-weight: bold; white-space: nowrap; font-size: 0.85em; }
+        .card-name.long { font-size: 0.7em; } 
+        .card-no { font-size: 0.6em; opacity: 0.5; margin-top: 2px; }
 
         .button-container { text-align: center; margin-top: 20px; padding-bottom: 40px; }
         button {
@@ -71,10 +71,15 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
+        /* --- スマホ用 (あやこが気に入ってくれたサイズをキープ) --- */
         @media (max-width: 768px) {
             .grid-8 { gap: 2px; }
             .grid-4 { width: 100%; gap: 2px; }
-            .card-symbol { font-size: 1.1em; }
+            .card-symbol { font-size: 1.1em; margin-bottom: 2px; }
+            .card-name { font-size: 0.65em; }
+            .card-name.long { font-size: 0.5em; } /* クローバー・コウノトリ用 */
+            .card-no { font-size: 0.5em; }
+            button { padding: 10px 25px; font-size: 0.9em; }
         }
     </style>
 </head>
