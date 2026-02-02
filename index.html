@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand Tableau</title>
     <style>
+        /* あやこのベースデザインを完全維持 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -15,6 +16,21 @@
         }
         .container { max-width: 1000px; margin: 0 auto; }
         h1 { text-align: center; margin-bottom: 15px; color: #e94560; font-size: 1.4em; letter-spacing: 2px; }
+
+        /* 入口（選択画面）のスタイル */
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        #start-screen p { margin-bottom: 30px; color: #cfd8dc; font-size: 0.9em; }
+        .mode-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; }
+
+        /* 占い画面（最初は隠しておく） */
+        #main-app { display: none; }
 
         .panorama-row {
             margin-bottom: 20px;
@@ -31,7 +47,6 @@
             padding-left: 8px;
         }
 
-        /* 改行して表示する解説欄のデザイン（崩れないように追加） */
         .area-description {
             margin-top: 10px;
             padding: 10px;
@@ -65,13 +80,12 @@
             padding: 2px;
         }
 
-        /* --- PC用の基本設定 --- */
         .card-symbol { font-size: 1.8em; margin-bottom: 4px; }
         .card-name { font-weight: bold; white-space: nowrap; font-size: 0.85em; }
         .card-name.long { font-size: 0.7em; } 
         .card-no { font-size: 0.6em; opacity: 0.5; margin-top: 2px; }
 
-        .button-container { text-align: center; margin-top: 20px; padding-bottom: 40px; }
+        .button-container { text-align: center; margin-top: 20px; padding-bottom: 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         button {
             background: #e94560;
             color: white;
@@ -81,9 +95,11 @@
             border-radius: 25px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: 0.3s;
         }
+        button:hover { background: #ff4d6d; }
+        .back-button { background: transparent; border: 1px solid #4ecca3; color: #4ecca3; font-size: 0.8em; padding: 8px 20px; }
 
-        /* --- スマホ用 --- */
         @media (max-width: 768px) {
             .grid-8 { gap: 2px; }
             .grid-4 { width: 100%; gap: 2px; }
@@ -97,54 +113,29 @@
 </head>
 <body>
     <div class="container">
-        <h1>Grand Tableau</h1>
-        <div id="tableau"></div>
-        <div class="button-container">
-            <button onclick="spreadGrandTableau()">シャッフルし直す</button>
+        <div id="start-screen">
+            <h1>Grand Tableau</h1>
+            <p>占う内容を選んでね</p>
+            <div class="mode-buttons">
+                <button onclick="startFortune('love')">恋愛</button>
+                <button onclick="startFortune('work')">仕事</button>
+                <button onclick="startFortune('other')">その他・総合</button>
+            </div>
+        </div>
+
+        <div id="main-app">
+            <h1 id="app-title">Grand Tableau</h1>
+            <div id="tableau"></div>
+            <div class="button-container">
+                <button onclick="spreadGrandTableau()">同じテーマでシャッフル</button>
+                <button class="back-button" onclick="location.reload()">← 最初に戻る</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // ここにあやこが拾ってきた意味をどんどん入れてね！
-        const cardData = {
-            "騎士": "速いニュース、新しい展開",
-            "クローバー": "小さな幸運、チャンス",
-            "船": "旅行、変化、ビジネス",
-            "家": "家庭、安定、プライベート",
-            "木": "健康、成長、生命力",
-            "雲": "不透明、一時的な不安",
-            "蛇": "複雑、嫉妬、回り道",
-            "棺": "終了、停止、再生の準備",
-            "花束": "贈り物、喜び、感謝",
-            "鎌": "突然の決断、切断、急変",
-            "鞭": "葛藤、議論、ストレス",
-            "鳥": "会話、SNS、賑やかさ",
-            "子供": "純粋、新しい始まり",
-            "キツネ": "仕事、戦略、巧妙",
-            "熊": "パワー、所有欲、上司",
-            "星": "希望、理想、導き",
-            "コウノトリ": "移動、環境の変化",
-            "犬": "信頼、友情、忠実",
-            "塔": "自立、孤独、公的機関",
-            "庭園": "社交、コミュニティ",
-            "山": "障害、遅延、困難",
-            "道": "選択、決断、分岐点",
-            "ネズミ": "損失、ストレス、削られる",
-            "ハート": "愛、感情、情熱",
-            "指輪": "契約、約束、繰り返し",
-            "本": "秘密、知識、学び",
-            "手紙": "メッセージ、通知、書類",
-            "紳士": "男性、行動、質問者本人",
-            "淑女": "女性、受容、質問者本人",
-            "百合": "平和、成熟、品格",
-            "太陽": "成功、勝利、エネルギー",
-            "月": "直感、名声、揺らぎ",
-            "鍵": "解決、重要、確信",
-            "魚": "お金、豊かさ、流れ",
-            "錨": "安定、長期的な仕事",
-            "十字架": "宿命、重荷、責任"
-        };
-
+        let cardData = {};
+        let currentMode = 'other';
         const cards = [
             { id: 1, name: "騎士", symbol: "🏇" }, { id: 2, name: "クローバー", symbol: "🍀" },
             { id: 3, name: "船", symbol: "⛵" }, { id: 4, name: "家", symbol: "🏠" },
@@ -166,6 +157,22 @@
             { id: 35, name: "錨", symbol: "⚓" }, { id: 36, name: "十字架", symbol: "✝️" }
         ];
 
+        // 占い開始の魔法
+        async function startFortune(mode) {
+            currentMode = mode;
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            
+            try {
+                // ここで外部のjsonファイルを読み込むよ
+                const response = await fetch('card_data.json');
+                cardData = await response.json();
+                spreadGrandTableau();
+            } catch (e) {
+                document.getElementById('tableau').innerText = "エラー：card_data.jsonが読み込めないよ！";
+            }
+        }
+
         function shuffle(array) {
             const newArray = [...array];
             for (let i = newArray.length - 1; i > 0; i--) {
@@ -177,52 +184,41 @@
 
         function createCardHtml(card) {
             const nameClass = card.name.length >= 4 ? "card-name long" : "card-name";
-            return `
-                <div class="card">
-                    <div class="card-symbol">${card.symbol}</div>
-                    <div class="${nameClass}">${card.name}</div>
-                    <div class="card-no">${card.id}</div>
-                </div>
-            `;
+            return `<div class="card"><div class="card-symbol">${card.symbol}</div><div class="${nameClass}">${card.name}</div><div class="card-no">${card.id}</div></div>`;
         }
 
         function spreadGrandTableau() {
             const shuffled = shuffle(cards);
             const tableau = document.getElementById('tableau');
             tableau.innerHTML = '';
+            const rowLabels = ["1段目：過去の背景", "2段目：現在のテーマ", "3段目：直近の未来", "4段目：結末"];
 
-            const rowLabels = [
-                "1段目：過去の背景",
-                "2段目：現在のテーマ",
-                "3段目：直近の未来",
-                "4段目：結末"
-            ];
-            
-            // 1〜4段目の表示
             for (let i = 0; i < 4; i++) {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'panorama-row';
                 rowDiv.innerHTML = `<div class="row-label">${rowLabels[i]}</div>`;
-                
                 const grid = document.createElement('div');
                 grid.className = 'grid-layout grid-8';
                 
                 let explanationHtml = "";
                 for (let j = 0; j < 8; j++) {
                     const card = shuffled[i * 8 + j];
+                    const data = cardData[card.name] || {};
                     grid.innerHTML += createCardHtml(card);
-                    // 1枚ずつ改行してリスト化
-                    explanationHtml += `・${card.name}（${cardData[card.name] || "意味を登録してね"}）<br>`;
+                    
+                    // モードによって表示する文章を変える
+                    let meaning = "";
+                    if (currentMode === 'love') meaning = data.love || "データなし";
+                    else if (currentMode === 'work') meaning = data.work || "データなし";
+                    else meaning = `✨${data.positive} / 💀${data.negative}`;
+
+                    explanationHtml += `・<b>${card.name}</b>（${data.keyword}）：${meaning}<br>`;
                 }
-                
                 rowDiv.appendChild(grid);
-                
-                // 解説欄を追加
                 const descDiv = document.createElement('div');
                 descDiv.className = 'area-description';
                 descDiv.innerHTML = explanationHtml;
                 rowDiv.appendChild(descDiv);
-                
                 tableau.appendChild(rowDiv);
             }
 
@@ -232,24 +228,22 @@
             finalRowDiv.innerHTML = `<div class="row-label">最終結論</div>`;
             const finalGrid = document.createElement('div');
             finalGrid.className = 'grid-layout grid-4';
-            
             let finalExpHtml = "";
             for (let k = 32; k < 36; k++) {
                 const card = shuffled[k];
+                const data = cardData[card.name] || {};
                 finalGrid.innerHTML += createCardHtml(card);
-                finalExpHtml += `・${card.name}（${cardData[card.name] || "意味を登録してね"}）<br>`;
+                let meaning = (currentMode === 'love') ? data.love : (currentMode === 'work' ? data.work : data.positive);
+                finalExpHtml += `・<b>${card.name}</b>：${meaning || "..."}<br>`;
             }
-            
             finalRowDiv.appendChild(finalGrid);
             const finalDescDiv = document.createElement('div');
             finalDescDiv.className = 'area-description';
             finalDescDiv.innerHTML = finalExpHtml;
             finalRowDiv.appendChild(finalDescDiv);
-            
             tableau.appendChild(finalRowDiv);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        spreadGrandTableau();
     </script>
 </body>
 </html>
