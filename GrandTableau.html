@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>あやこのグランタブロー v2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 20px; color: #e94560; font-size: 1.5em; }
+
+        .panorama-row {
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .row-label {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #4ecca3;
+            border-left: 4px solid #4ecca3;
+            padding-left: 10px;
+        }
+
+        /* 1〜4段目のグリッド設定 */
+        .grid-8 {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+        }
+
+        /* カードの基本設定（サイズ固定！） */
+        .card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px;
+            width: 100%;
+            aspect-ratio: 2 / 3; /* 黄金比に近い縦横比をキープ */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+            overflow: hidden; /* はみ出し防止 */
+        }
+        .card:hover { transform: translateY(-5px); z-index: 10; }
+
+        .card-symbol { font-size: 1.8em; margin-bottom: 2px; }
+        .card-name { font-size: 0.75em; font-weight: bold; white-space: nowrap; }
+        .card-no { font-size: 0.6em; opacity: 0.6; margin-top: 2px; }
+
+        /* 最後の4枚を大きくする設定 */
+        .final-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .final-row .card {
+            width: 110px; /* ここでサイズを指定 */
+            height: 165px;
+            background: linear-gradient(135deg, #e94560 0%, #764ba2 100%); /* 色もちょっと変えてみた */
+        }
+        .final-row .card-symbol { font-size: 2.5em; }
+        .final-row .card-name { font-size: 1em; }
+
+        .button-container { text-align: center; margin-top: 40px; }
+        button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background: #ff4d6d; transform: scale(1.05); }
+
+        /* スマホで見るときは無理せず4列にする */
+        @media (max-width: 768px) {
+            .grid-8 { grid-template-columns: repeat(4, 1fr); }
+            .final-row { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Ayako's Grand Tableau ✨</h1>
+        <div id="tableau"></div>
+        <div class="button-container">
+            <button onclick="spreadGrandTableau()">カードをシャッフルして展開</button>
+        </div>
+    </div>
+
+    <script>
+        const cards = [
+            { id: 1, name: "騎士", symbol: "🏇" }, { id: 2, name: "クローバー", symbol: "🍀" },
+            { id: 3, name: "船", symbol: "⛵" }, { id: 4, name: "家", symbol: "🏠" },
+            { id: 5, name: "木", symbol: "🌳" }, { id: 6, name: "雲", symbol: "☁️" },
+            { id: 7, name: "蛇", symbol: "🐍" }, { id: 8, name: "棺", symbol: "⚰️" },
+            { id: 9, name: "花束", symbol: "💐" }, { id: 10, name: "鎌", symbol: "⚔️" },
+            { id: 11, name: "鞭", symbol: "🔨" }, { id: 12, name: "鳥", symbol: "🕊️" },
+            { id: 13, name: "子供", symbol: "👶" }, { id: 14, name: "キツネ", symbol: "🦊" },
+            { id: 15, name: "熊", symbol: "🐻" }, { id: 16, name: "星", symbol: "⭐" },
+            { id: 17, name: "コウノトリ", symbol: "🦢" }, { id: 18, name: "犬", symbol: "🐕" },
+            { id: 19, name: "塔", symbol: "🏛️" }, { id: 20, name: "庭園", symbol: "🌸" },
+            { id: 21, name: "山", symbol: "⛰️" }, { id: 22, name: "道", symbol: "🛤️" },
+            { id: 23, name: "ネズミ", symbol: "🐭" }, { id: 24, name: "ハート", symbol: "❤️" },
+            { id: 25, name: "指輪", symbol: "💍" }, { id: 26, name: "本", symbol: "📖" },
+            { id: 27, name: "手紙", symbol: "📝" }, { id: 28, name: "紳士", symbol: "👨" },
+            { id: 29, name: "淑女", symbol: "👩" }, { id: 30, name: "百合", symbol: "⚜️" },
+            { id: 31, name: "太陽", symbol: "☀️" }, { id: 32, name: "月", symbol: "🌙" },
+            { id: 33, name: "鍵", symbol: "🔑" }, { id: 34, name: "魚", symbol: "🐟" },
+            { id: 35, name: "錨", symbol: "⚓" }, { id: 36, name: "十字架", symbol: "✝️" }
+        ];
+
+        function shuffle(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function createCardHtml(card) {
+            return `
+                <div class="card">
+                    <div class="card-symbol">${card.symbol}</div>
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-no">${card.id}</div>
+                </div>
+            `;
+        }
+
+        function spreadGrandTableau() {
+            const shuffled = shuffle(cards);
+            const tableau = document.getElementById('tableau');
+            tableau.innerHTML = '';
+
+            const rowLabels = ["1段目：過去の背景", "2段目：現在のテーマ", "3段目：直近の流れ", "4段目：結末・深層"];
+            
+            for (let i = 0; i < 4; i++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'panorama-row';
+                rowDiv.innerHTML = `<div class="row-label">${rowLabels[i]}</div>`;
+                const grid = document.createElement('div');
+                grid.className = 'grid-8';
+                for (let j = 0; j < 8; j++) {
+                    grid.innerHTML += createCardHtml(shuffled[i * 8 + j]);
+                }
+                rowDiv.appendChild(grid);
+                tableau.appendChild(rowDiv);
+            }
+
+            const finalRowDiv = document.createElement('div');
+            finalRowDiv.className = 'panorama-row';
+            finalRowDiv.innerHTML = `<div class="row-label">運命の4枚（アドバイス）</div>`;
+            const finalGrid = document.createElement('div');
+            finalGrid.className = 'final-row';
+            for (let k = 32; k < 36; k++) {
+                finalGrid.innerHTML += createCardHtml(shuffled[k]);
+            }
+            finalRowDiv.appendChild(finalGrid);
+            tableau.appendChild(finalRowDiv);
+        }
+
+        spreadGrandTableau();
+    </script>
+</body>
+</html>
