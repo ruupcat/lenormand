@@ -3,92 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>あやこのグランタブロー v2</title>
+    <title>あやこのグランタブロー v3</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
-            padding: 20px;
+            padding: 10px; /* スマホ用に余白を少し削ったよ */
             min-height: 100vh;
         }
         .container { max-width: 1000px; margin: 0 auto; }
-        h1 { text-align: center; margin-bottom: 20px; color: #e94560; font-size: 1.5em; }
+        h1 { text-align: center; margin-bottom: 15px; color: #e94560; font-size: 1.2em; }
 
         .panorama-row {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.03);
-            padding: 15px;
+            padding: 10px;
             border-radius: 12px;
         }
         .row-label {
-            font-size: 0.9em;
+            font-size: 0.8em;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             color: #4ecca3;
-            border-left: 4px solid #4ecca3;
-            padding-left: 10px;
+            border-left: 3px solid #4ecca3;
+            padding-left: 8px;
         }
 
-        /* 1〜4段目のグリッド設定 */
-        .grid-8 {
+        /* 1〜4段目 & 運命の4枚 共通のグリッド設定 */
+        .grid-layout {
             display: grid;
+            gap: 5px; /* カード同士の間隔を少し狭くして横並びを優先 */
+        }
+        
+        /* 8枚並ぶ段 */
+        .grid-8 {
             grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
         }
 
-        /* カードの基本設定（サイズ固定！） */
+        /* 4枚並ぶ段（ここを強制的に横4枚にするよ） */
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+            width: 50%; /* 8枚並びに対して半分の幅にする（PC用） */
+            margin: 0 auto; /* 中央寄せ */
+        }
+
         .card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 6px;
+            border-radius: 4px;
             width: 100%;
-            aspect-ratio: 2 / 3; /* 黄金比に近い縦横比をキープ */
+            aspect-ratio: 2 / 3;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-            overflow: hidden; /* はみ出し防止 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
-        .card:hover { transform: translateY(-5px); z-index: 10; }
 
-        .card-symbol { font-size: 1.8em; margin-bottom: 2px; }
-        .card-name { font-size: 0.75em; font-weight: bold; white-space: nowrap; }
-        .card-no { font-size: 0.6em; opacity: 0.6; margin-top: 2px; }
+        .card-symbol { font-size: 1.4em; } /* 少し小さくしてはみ出し防止 */
+        .card-name { font-size: 0.6em; font-weight: bold; white-space: nowrap; }
+        .card-no { font-size: 0.5em; opacity: 0.6; }
 
-        /* 最後の4枚を大きくする設定 */
-        .final-row {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .final-row .card {
-            width: 110px; /* ここでサイズを指定 */
-            height: 165px;
-            background: linear-gradient(135deg, #e94560 0%, #764ba2 100%); /* 色もちょっと変えてみた */
-        }
-        .final-row .card-symbol { font-size: 2.5em; }
-        .final-row .card-name { font-size: 1em; }
-
-        .button-container { text-align: center; margin-top: 40px; }
+        .button-container { text-align: center; margin-top: 20px; padding-bottom: 30px; }
         button {
             background: #e94560;
             color: white;
             border: none;
-            padding: 12px 35px;
-            font-size: 1em;
-            border-radius: 30px;
+            padding: 10px 25px;
+            font-size: 0.9em;
+            border-radius: 20px;
             cursor: pointer;
-            transition: 0.3s;
         }
-        button:hover { background: #ff4d6d; transform: scale(1.05); }
 
-        /* スマホで見るときは無理せず4列にする */
+        /* スマホ用（画面が768px以下のとき） */
         @media (max-width: 768px) {
-            .grid-8 { grid-template-columns: repeat(4, 1fr); }
-            .final-row { flex-wrap: wrap; }
+            .grid-8 { grid-template-columns: repeat(8, 1fr); gap: 3px; }
+            .grid-4 { grid-template-columns: repeat(4, 1fr); width: 100%; gap: 3px; }
+            .card-symbol { font-size: 1.1em; }
+            .card-name { font-size: 0.5em; }
+            h1 { font-size: 1em; }
         }
     </style>
 </head>
@@ -97,7 +92,7 @@
         <h1>✨ Ayako's Grand Tableau ✨</h1>
         <div id="tableau"></div>
         <div class="button-container">
-            <button onclick="spreadGrandTableau()">カードをシャッフルして展開</button>
+            <button onclick="spreadGrandTableau()">カードをシャッフル</button>
         </div>
     </div>
 
@@ -154,7 +149,7 @@
                 rowDiv.className = 'panorama-row';
                 rowDiv.innerHTML = `<div class="row-label">${rowLabels[i]}</div>`;
                 const grid = document.createElement('div');
-                grid.className = 'grid-8';
+                grid.className = 'grid-layout grid-8';
                 for (let j = 0; j < 8; j++) {
                     grid.innerHTML += createCardHtml(shuffled[i * 8 + j]);
                 }
@@ -164,9 +159,9 @@
 
             const finalRowDiv = document.createElement('div');
             finalRowDiv.className = 'panorama-row';
-            finalRowDiv.innerHTML = `<div class="row-label">運命の4枚（アドバイス）</div>`;
+            finalRowDiv.innerHTML = `<div class="row-label">運命の4枚</div>`;
             const finalGrid = document.createElement('div');
-            finalGrid.className = 'final-row';
+            finalGrid.className = 'grid-layout grid-4';
             for (let k = 32; k < 36; k++) {
                 finalGrid.innerHTML += createCardHtml(shuffled[k]);
             }
